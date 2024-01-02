@@ -6,7 +6,7 @@
     <title>Game</title>
     <style>
     body {
-      background-image: url('/background1.jpg'); /* ÕâÀïÖ¸¶¨ÁË±³¾°Í¼Æ¬µÄÂ·¾¶ */
+      background-image: url('/background.jpg'); /* ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ë±ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½Â·ï¿½ï¿½ */
       background-size: cover;
       background-position: center;
       height: 100vh;
@@ -16,19 +16,40 @@
       align-items: center;
       color:white;
       font-size: 24px;
+      h1 {
+        position: relative;
+        top: 30%;
+      }
+      form {
+        position: relative;
+        top: 31%;
+        font-size: 28px;
+        div {
+          display: flex;
+          flex-wrap: wrap;
+          flex-direction: column;
+          div {
+            display: block;
+          }
+        }
+      }
     }
   </style>
     
 </head>
 <body>
-    <h1><%= question %></h1>
+    <h1><%= questionID+1 %>. <%= question %></h1>
     <form action="/submit" method="post">
+      <div>
         <% for(let i=0; i<options.length; i++) { %>
+          <div>
             <input type="radio" name="option" value="<%= options[i] %>">
             <label><%= options[i] %></label>
-
+          </div>
         <% } %><br>
-        <input type="submit" value="Next">
+      </div>
+      <input type="submit" value="Next" style="font-size: 24px;border-radius: 12px;padding: 0.5rem 1rem;">
+      <!-- <label><%= score %></label> -->
     </form>
 </body>
 </html>
