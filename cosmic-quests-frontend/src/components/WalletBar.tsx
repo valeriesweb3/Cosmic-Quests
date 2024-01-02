@@ -2,10 +2,12 @@
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import { useMemo } from "react";
 import { Button } from "./ui/Button";
+import { useRouter } from "next/navigation";
 
 function WalletConnected() {
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
+  const router = useRouter()
 
   const shortenedAddress = useMemo(() => {
     if (!address) return "";
@@ -13,9 +15,14 @@ function WalletConnected() {
   }, [address]);
 
   return (
-    <div>
-      <span>Connected: {shortenedAddress}</span>
-      <button onClick={() => disconnect()}>Disconnect</button>
+    <div className="">
+      <div>
+        <span>Connected: {shortenedAddress}</span>
+        <Button onClick={() => disconnect()}>Disconnect</Button>
+      </div>
+      <div className="flex flex-col items-center justify-center">
+        <Button onClick={() => router.push('/page3')}>Start Game</Button>
+      </div>
     </div>
   );
 }
