@@ -1,111 +1,148 @@
-//³ÌÐòÈë¿Ú£ºÃüÁîÐÐÊäÈënode app.js
-const starknet = require('starknet');
-const starknetkit = require('starknetkit');
-const express = require('express');
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½node app.js
+const starknet = require("starknet");
+const starknetkit = require("starknetkit");
+const express = require("express");
 const app = express();
 const port = 3000;
 const dataArray = [];
-const fs = require('fs');
-const parse = require('csv-parse');
-// ¶ÁÈ¡Ìâ¿âCSVÎÄ¼þ
-const inputFile = 'data.csv';
+const fs = require("fs");
+const parse = require("csv-parse");
+// ï¿½ï¿½È¡ï¿½ï¿½ï¿½CSVï¿½Ä¼ï¿½
+const inputFile = "data.csv";
 
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
 let currentQuestion = 0;
-let currentQuestionId = 0;
+let currentQuestionId = -1;
 let score = 0;
 let isInGame = 0;
+let bingo = false;
 
 dataParse();
-//Á¬½ÓºÏÔ¼
-const provider = new starknet.RpcProvider({ nodeUrl: "https://starknet-testnet.public.blastapi.io" });
+//ï¿½ï¿½ï¿½Óºï¿½Ô¼
+const provider = new starknet.RpcProvider({
+  nodeUrl: "https://starknet-testnet.public.blastapi.io",
+});
 console.log("Provider connected to RPC");
-const myPrivateKey = "0x03e9be7873a4e116cbe018af397e8ae336e587f0b6eefccb1370a2aa9e46816b";
-const myWalltAddress = "0x065C7954aC551d3bca096B78d6a8575d37F59661dd3b74f37A57be85461C7c93";
+const myPrivateKey =
+  "0x03e9be7873a4e116cbe018af397e8ae336e587f0b6eefccb1370a2aa9e46816b";
+const myWalltAddress =
+  "0x065C7954aC551d3bca096B78d6a8575d37F59661dd3b74f37A57be85461C7c93";
 const account0 = new starknet.Account(provider, myWalltAddress, myPrivateKey);
 
-const testAddress = "0x01e3f27a76abc1e41742fa163579108d1454d606cb3fb5bff8306b912298677c";
-const compiledTest = starknet.json.parse(fs.readFileSync("contracts_Game.contract_class.json").toString("ascii"));
-const myTestContract = new starknet.Contract(compiledTest.abi, testAddress, provider);
-console.log('? Test Contract connected at =', myTestContract.address);
-//Ò³ÃæÏÔÊ¾
+const testAddress =
+  "0x01e3f27a76abc1e41742fa163579108d1454d606cb3fb5bff8306b912298677c";
+const compiledTest = starknet.json.parse(
+  fs.readFileSync("contracts_Game.contract_class.json").toString("ascii")
+);
+const myTestContract = new starknet.Contract(
+  compiledTest.abi,
+  testAddress,
+  provider
+);
+console.log("? Test Contract connected at =", myTestContract.address);
+
+//Ò³ï¿½ï¿½ï¿½ï¿½Ê¾
 app.use(express.static("public"));
-app.get('/', (req, res) => {
-    if (isInGame==0) {
-        res.render('index');
-    }
-    else if (currentQuestion < 27) {
-        currentQuestionId = getRandomId();
-        res.render('game', { question: dataArray[currentQuestionId][0], options: [dataArray[currentQuestionId][1], dataArray[currentQuestionId][2], dataArray[currentQuestionId][3]] });
-    } else {
-        res.render('result', { score: score });
-    }
+app.get("/", (req, res) => {
+  if (isInGame == 0) {
+    res.render("index");
+  } else if (bingo == true && currentQuestion<8) {
+    res.render("universe5", {});
+  } else if (bingo == true && currentQuestion<18) {
+    res.render("universe6", {});
+  } else if (bingo == true && currentQuestion<28) {
+    res.render("universe7", {});
+  } else if (currentQuestion < 27) {
+    // currentQuestionId = getRandomId();
+    currentQuestionId++;
+    res.render("game", {
+      questionID: currentQuestionId,
+      question: dataArray[currentQuestionId][0],
+      options: [
+        dataArray[currentQuestionId][1],
+        dataArray[currentQuestionId][2],
+        dataArray[currentQuestionId][3],
+      ],
+      score: score,
+    });
+  } else {
+    res.render("result", { score: score });
+  }
 });
 
-app.post('/submit', (req, res) => {
-    const selectedOption = req.body.option;
-    if (selectedOption === dataArray[currentQuestionId][4]) {
-        score++;
-    }
-    currentQuestion++;
-    res.redirect('/');
+app.post("/back", (req, res) => {
+    bingo = false;
+    res.redirect("/");
+  });
+
+app.post("/submit", (req, res) => {
+  const selectedOption = req.body.option;
+  if (selectedOption === dataArray[currentQuestionId][4]) {
+    score++;
+    if (
+      currentQuestionId == 26 ||
+      currentQuestionId == 16 ||
+      currentQuestionId == 6
+    )
+      bingo = true;
+  }
+  currentQuestion++;
+  res.redirect("/");
 });
-app.post('/connect', (req, res) => {
-    const walletAddress = req.body.name;
-   /* startGame();
+app.post("/connect", (req, res) => {
+  const walletAddress = req.body.name;
+  /* startGame();
     const start = checkGameState();
     if (start == true) {
         isInGame = 1;
         res.redirect('/');
     }*/
-    isInGame = 1;
-    res.redirect('/');
+  isInGame = 1;
+  res.redirect("/");
 });
-app.post('/quit', (req, res) => {
-    currentQuestion = 0;
-    score = 0;
-    isInGame = 0;
-    res.redirect('/');
+app.post("/quit", (req, res) => {
+  currentQuestion = 0;
+  score = 0;
+  isInGame = 0;
+  res.redirect("/");
 });
 
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at http://localhost:${port}`);
 });
-//½âÎöÊý¾Ý±í¸ñ
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý±ï¿½ï¿½ï¿½
 function dataParse() {
-    fs.createReadStream(inputFile)
-        .pipe(parse.parse({ delimiter: ',' }))
-        .on('data', (row) => {
-            // Ã¿ÐÐÊý¾Ý´æ´¢µ½Êý×éÖÐ
-            dataArray.push(row);
-        })
-        
+  fs.createReadStream(inputFile)
+    .pipe(parse.parse({ delimiter: "," }))
+    .on("data", (row) => {
+      // Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½Ý´æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+      dataArray.push(row);
+    });
 }
 function getRandomId() {
-    return Math.floor(Math.random() * (dataArray.length  + 1));
+  return Math.floor(Math.random() * (dataArray.length + 1));
 }
 async function startGame() {
-    //myTestContract.connect(account0);
-    const connection = await starknetkit.connect();
-    if (connection && connection.isConnected) {
-        setConnection(connection)
-        setProvider(connection.account)
-        setAddress(connection.selectedAddress)
-    }
+  //myTestContract.connect(account0);
+  const connection = await starknetkit.connect();
+  if (connection && connection.isConnected) {
+    setConnection(connection);
+    setProvider(connection.account);
+    setAddress(connection.selectedAddress);
+  }
 }
 
 async function checkGameState() {
-    return await myTestContract.is_in_game();
+  return await myTestContract.is_in_game();
 }
-//½»»¥°¸Àý
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 async function interactWithContract() {
-
-    const res = await myTestContract.is_in_game();
-    console.log('? Test Is In Game =', res);
-    const adv = await myTestContract.get_current_adventure();
-    console.log('? Test Get Current Adventure =', adv._genesis_timestamp);
+  const res = await myTestContract.is_in_game();
+  console.log("? Test Is In Game =", res);
+  const adv = await myTestContract.get_current_adventure();
+  console.log("? Test Get Current Adventure =", adv._genesis_timestamp);
 }
 /*interactWithContract()
     .catch((error) => {
