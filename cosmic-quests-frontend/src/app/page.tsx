@@ -1,52 +1,61 @@
-"use client";
-import WalletBar from "@/components/WalletBar";
+// 导入 Next.js 和 React 相关的包
+import Head from 'next/head';
+import { useState } from 'react';
 
-export default function Home() {
+// 导入 CSS 模块
+import styles from '../styles/Home.module.css';
+
+// 导入组件
+import WalletBar from '@/components/WalletBar';
+import { StarknetProvider } from '@/components/starknet-provider';
+import Mainpage from '@/components/mainpage';
+
+// Home 组件
+function Home() {
+  // State 和函数（如果有的话）
+
+  // 返回 JSX
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen gap-12">
-      <WalletBar />
-      <p className="mb-2 text-lg">
-        Get started by editing&nbsp;
-        <code className="p-2 bg-gray-600 rounded">pages/index.tsx</code>
-      </p>
-      <div className="flex flex-row gap-12">
-        <a
-          className="p-4 rounded-md w-48 bg-black border flex flex-col items-center justify-center gap-6 group"
-          href="https://starknet.io/docs"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <img
-            src="https://pbs.twimg.com/profile_images/1656626805816565763/WyFDMG6u_400x400.png"
-            className="object-contain w-24 h-24"
-            alt="starknet-icon"
-          />
-          <p className="mb-2 text-lg text-center">
-            Starknet Documentation
-            <span className=" group-hover:font-bold transition-all ml-2 group-hover:ml-4">
-              {">"}
-            </span>
-          </p>
-        </a>
-        <a
-          className="p-4 rounded-md w-48 bg-black border flex flex-col items-center justify-center gap-6 group"
-          href="https://starknet-react.com/docs/getting-started"
-          target="_blank"
-          rel="norefferer"
-        >
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1150px-React-icon.svg.png"
-            className="object-contain w-24 h-24"
-            alt="react-icon"
-          />
-          <p className="mb-2 text-lg text-center">
-            Starknet React Documentation
-            <span className="group-hover:font-bold transition-all ml-2 group-hover:ml-4">
-              {">"}
-            </span>
-          </p>
-        </a>
-      </div>
-    </main>
+    <div>
+      <Head>
+        <title>Account Lend and Rent</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+      </Head>
+
+      <nav className={styles.navbar}>
+        <ul>
+          <li><strong>Account Lend and Rent</strong></li>
+        </ul>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Help</a></li>
+          <li><a href="#" role="button">Logout</a></li>
+        </ul>
+      </nav>
+
+      <main className={styles.main}>
+        <div className={styles.grid}>
+          <section>
+            <StarknetProvider>
+              <h2>Account Information</h2>
+              <h3>Manage Your Account</h3>
+
+              <div className={styles.buttonGroup}>
+                <WalletBar />
+              </div>
+              <Mainpage/>
+            </StarknetProvider>
+          </section>
+        </div>
+      </main>
+
+      <footer className={styles.footer}>
+        <small><a href="#">Privacy Policy</a> • <a href="#">Terms & Conditions</a></small>
+      </footer>
+    </div>
   );
 }
+
+// 导出 Home 组件
+export default Home;
