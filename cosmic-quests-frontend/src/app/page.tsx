@@ -1,5 +1,6 @@
 "use client";
 
+import { use, useEffect } from "react";
 import "./globals.css";
 import { useRouter } from "next/navigation";
 
@@ -10,6 +11,11 @@ export default function Page1() {
       //navigate('/connect')
       router.push('/page2')
   }
+  useEffect(() => {
+    setTimeout(() => {
+      router.push('/page2')
+    }, 3000);
+  }, []);
 
   return (
     <div className="App" onClick={handleClick}>
